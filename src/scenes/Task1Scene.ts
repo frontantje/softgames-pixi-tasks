@@ -45,8 +45,20 @@ export class Task1Scene extends BaseTaskScene {
     this.startStaggerLoop();
   }
   private createInitialCardStack() {
+    // Create all cards
+    const cards: BaseCard[] = [];
     for (let i = 0; i < this.numberOfCards; i++) {
-      const card = new BaseCard(i);
+      cards.push(new BaseCard(i));
+    }
+
+    // Shuffle the cards using Fisher-Yates algorithm
+    for (let i = cards.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [cards[i], cards[j]] = [cards[j], cards[i]];
+    }
+
+    // Add shuffled cards to stack
+    for (const card of cards) {
       this.stack1Container.addChild(card);
       card.anchor.set(0.5);
       card.rotation = (Math.random() - 0.5) * 10 * (Math.PI / 180);
