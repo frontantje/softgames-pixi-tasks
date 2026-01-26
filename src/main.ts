@@ -24,7 +24,6 @@ class App {
       antialias: true,
       resolution: window.devicePixelRatio || 1,
     });
-    BaseCard.setRenderer(this.app.renderer);
 
     document.getElementById("app")?.appendChild(this.app.canvas);
 
@@ -33,6 +32,9 @@ class App {
 
     // Setup Scene Manager
     this.sceneManager = new SceneManager(this.app);
+
+    // Set renderer for BaseCard (using sceneManager's renderer)
+    BaseCard.setRenderer(this.sceneManager.renderer);
 
     // Setup FPS Counter
     this.fpsCounter = new FPSCounter(this.app);

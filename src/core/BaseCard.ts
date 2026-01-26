@@ -1,12 +1,12 @@
-import { Sprite, Graphics, RenderTexture, Text } from "pixi.js";
+import { Sprite, Graphics, RenderTexture, Text, Renderer } from "pixi.js";
 
 export class BaseCard extends Sprite {
   private static cardTextureCache: Map<string, RenderTexture> = new Map();
   private static symbolTextureCache: Map<number, RenderTexture> = new Map();
-  private static renderer: any;
+  private static renderer: Renderer;
   private symbolSprite: Sprite;
 
-  static setRenderer(renderer: any) {
+  static setRenderer(renderer: Renderer) {
     BaseCard.renderer = renderer;
   }
 
@@ -32,8 +32,9 @@ export class BaseCard extends Sprite {
       });
 
       if (BaseCard.renderer) {
-        BaseCard.renderer.render(backgroundGraphics, {
-          renderTexture: backgroundTexture,
+        BaseCard.renderer.render({
+          container: backgroundGraphics,
+          target: backgroundTexture,
         });
       }
 
@@ -100,8 +101,9 @@ export class BaseCard extends Sprite {
     });
 
     if (BaseCard.renderer) {
-      BaseCard.renderer.render(symbolText, {
-        renderTexture: symbolTexture,
+      BaseCard.renderer.render({
+        container: symbolText,
+        target: symbolTexture,
       });
     }
 
