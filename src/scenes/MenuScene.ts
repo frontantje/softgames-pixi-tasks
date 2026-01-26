@@ -36,7 +36,7 @@ export class MenuScene extends Scene {
 
     const tasks = [
       { name: "Task 1: Ace of Shadows", scene: Task1Scene },
-      { name: "Task 2: Emoji Dialog", scene: Task2Scene },
+      { name: "Task 2: Magic Words", scene: Task2Scene },
       { name: "Task 3: Particles!", scene: Task3Scene },
     ];
 

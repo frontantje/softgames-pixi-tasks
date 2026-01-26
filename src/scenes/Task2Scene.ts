@@ -1,29 +1,208 @@
 import { BaseTaskScene } from "../core/BaseTaskScene";
 import { SceneManager } from "../core/SceneManager";
-import { Text } from "pixi.js";
+import { DialogueContainer } from "../core/DialogueContainer";
+import { Assets, Sprite, Texture, Text } from "pixi.js";
+
+interface DialogueLine {
+  name: string;
+  text: string;
+}
+
+interface Emoji {
+  name: string;
+  url: string;
+}
+
+interface Avatar {
+  name: string;
+  url: string;
+  position: "left" | "right";
+}
+
+interface ResponseData {
+  dialogue: DialogueLine[];
+  emojies: Emoji[];
+  avatars: Avatar[];
+}
+
+interface DialogueStep {
+  position: "left" | "right";
+  avatar: Texture | undefined;
+  emoji: Texture | undefined;
+  text: string;
+}
 
 export class Task2Scene extends BaseTaskScene {
-  private titleText!: Text;
+  // Constants
+  private readonly API_URL =
+    "https://private-624120-softgamesassignment.apiary-mock.com/v2/magicwords";
+
+  // UI Elements
+  private titleText: Text;
+  private subText: Text;
+  private leftDialogue: DialogueContainer;
+  private rightDialogue: DialogueContainer;
+
+  // State
+  private dialogueStepIndex: number = 0;
+
+  // Data
+  private emojiTextures: Map<string, Texture> = new Map();
+  private dialogueSteps: DialogueStep[] = []; // Array instead of Map
 
   constructor(sceneManager: SceneManager) {
     super(sceneManager);
+
+    // Initialize UI elements immediately
+    this.titleText = new Text({
+      text: "Task 2: Magic Words",
+      style: { fontSize: 32, fill: 0xffffff, align: "center" },
+    });
+    this.titleText.anchor.set(0.5);
+
+    this.subText = new Text({
+      text: "",
+      style: { fontSize: 18, fill: 0xffffff, align: "center" },
+    });
+    this.subText.anchor.set(0.5);
+    this.subText.y = 50;
+
+    this.leftDialogue = new DialogueContainer("left");
+    this.rightDialogue = new DialogueContainer("right");
+
     this.init();
   }
 
-  private init() {
+  private async init() {
     this.titleText = new Text({
-      text: "Task 2: Emoji Dialog\n\n(Implementation here)",
+      text: "Task 2: Magic Words",
       style: { fontSize: 32, fill: 0xffffff, align: "center" },
     });
     this.titleText.anchor.set(0.5);
     this.content.addChild(this.titleText);
+    this.subText = new Text({
+      text: "",
+      style: { fontSize: 18, fill: 0xffffff, align: "center" },
+    });
+    this.subText.anchor.set(0.5);
+    this.subText.y += 50;
+    this.content.addChild(this.subText);
+
+    // create dialogue sides
+    this.leftDialogue = new DialogueContainer("left");
+    this.rightDialogue = new DialogueContainer("right");
+    this.content.addChild(this.leftDialogue);
+    this.content.addChild(this.rightDialogue);
+
+    // fetch data from api
+    const data = await this.fetchData();
+    // load all image assets
+    await this.loadAssets(data);
+
+    this.content.cursor = "pointer";
+    this.content.eventMode = "static";
+    this.subText.text = "Click to start";
+    this.content.on("mousedown", this.advanceDialogue.bind(this));
+
+    // create sprites
+    //   this.createAvatars(data.avatars);
   }
 
-  public update(delta: number): void {
-    // Task 2 logic
+  private async fetchData(): Promise<ResponseData> {
+    const response = await fetch(this.API_URL);
+    return response.json();
+  }
+
+  private async loadAssets(data: ResponseData): Promise<void> {
+    try {
+      // Collect all URLs to load
+      const urls = [
+        ...data.avatars.map((a) => ({
+          alias: `avatar_${a.name}`,
+          src: a.url,
+          parser: "texture",
+        })),
+        ...data.emojies.map((e) => ({
+          alias: `emoji_${e.name}`,
+          src: e.url,
+          parser: "texture",
+        })),
+      ];
+
+      // Load all assets sequentially with progress
+      let loaded = 0;
+      const total = urls.length;
+
+      for (const item of urls) {
+        await Assets.load(item);
+        loaded++;
+        this.subText.text = `Loading: ${Math.round((loaded / total) * 100)}%`;
+      }
+
+      // Store emoji textures
+      data.emojies.forEach((emoji) => {
+        const texture = Assets.get(`emoji_${emoji.name}`);
+        if (texture) {
+          this.emojiTextures.set(emoji.name, texture);
+        }
+      });
+
+      // parse dialogue data
+      data.dialogue.forEach((line) => {
+        const dialogueStep: DialogueStep = {
+          position:
+            data.avatars.find((a) => a.name === line.name)?.position || "left",
+          avatar: this.getAvatarTexture(line.name),
+          emoji: this.getEmojiTexture(line.text),
+          text: line.text,
+        };
+        this.dialogueSteps.push(dialogueStep);
+      });
+
+      console.log("All assets loaded successfully");
+    } catch (error) {
+      console.error("Error loading assets:", error);
+    }
+  }
+
+  private advanceDialogue() {
+    if (this.dialogueStepIndex === 0) {
+      this.subText.text = "Click to proceed";
+    }
+    if (this.dialogueStepIndex < this.dialogueSteps.length) {
+      const step = this.dialogueSteps[this.dialogueStepIndex];
+      this.dialogueStepIndex++;
+    } else {
+      this.subText.text = "The End!";
+    }
+  }
+
+  private getAvatarTexture(avatarName: string): Texture | undefined {
+    // Get cached texture
+    const texture = Assets.get(`avatar_${avatarName}`);
+    if (texture) {
+      return texture;
+    } else {
+      return Assets.get("../assets/images/Placeholder_Person.jpg");
+    }
+  }
+
+  private getEmojiTexture(dialogueText: string): Texture | undefined {
+    const emojiName = dialogueText.match(/\{(\w+)\}/)?.[1];
+    if (emojiName) {
+      return this.emojiTextures.get(emojiName);
+    }
+    return undefined;
   }
 
   protected onContentResize(width: number, height: number): void {
+    // Position sides
+    this.leftDialogue.x = -width / 2 + 50;
+    this.leftDialogue.y = -height / 2 + 100;
+
+    this.rightDialogue.x = width / 2 - 50;
+    this.rightDialogue.y = -height / 2 + 100;
+
     this.centerContent();
   }
 }
