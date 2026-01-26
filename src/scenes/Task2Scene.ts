@@ -1,7 +1,8 @@
 import { BaseTaskScene } from "../core/BaseTaskScene";
 import { SceneManager } from "../core/SceneManager";
 import { DialogueContainer } from "../core/DialogueContainer";
-import { Assets, Sprite, Texture, Text } from "pixi.js";
+import { Assets, Texture, Text } from "pixi.js";
+import placeholderUrl from "../assets/images/Placeholder_Person.jpg";
 
 interface DialogueLine {
   name: string;
@@ -114,6 +115,12 @@ export class Task2Scene extends BaseTaskScene {
   }
 
   private async loadAssets(data: ResponseData): Promise<void> {
+    // load placeholder first
+    await Assets.load({
+      alias: "placeholder_avatar",
+      src: placeholderUrl,
+    });
+
     try {
       // Collect all URLs to load
       const urls = [
@@ -154,7 +161,7 @@ export class Task2Scene extends BaseTaskScene {
             data.avatars.find((a) => a.name === line.name)?.position || "left",
           avatar: this.getAvatarTexture(line.name),
           emoji: this.getEmojiTexture(line.text),
-          text: line.text,
+          text: this.getSanitizedText(line.text),
         };
         this.dialogueSteps.push(dialogueStep);
       });
@@ -171,9 +178,14 @@ export class Task2Scene extends BaseTaskScene {
     }
     if (this.dialogueStepIndex < this.dialogueSteps.length) {
       const step = this.dialogueSteps[this.dialogueStepIndex];
+      const relevantContainer: DialogueContainer =
+        step.position === "left" ? this.leftDialogue : this.rightDialogue;
+      relevantContainer.showDialogue(step.text, step.avatar, step.emoji);
       this.dialogueStepIndex++;
     } else {
       this.subText.text = "The End!";
+      this.leftDialogue.hideDialogue();
+      this.rightDialogue.hideDialogue();
     }
   }
 
@@ -183,7 +195,7 @@ export class Task2Scene extends BaseTaskScene {
     if (texture) {
       return texture;
     } else {
-      return Assets.get("../assets/images/Placeholder_Person.jpg");
+      return Assets.get("placeholder_avatar");
     }
   }
 
@@ -193,6 +205,10 @@ export class Task2Scene extends BaseTaskScene {
       return this.emojiTextures.get(emojiName);
     }
     return undefined;
+  }
+
+  private getSanitizedText(dialogueText: string): string {
+    return dialogueText.replace(/\{(\w+)\}/g, "");
   }
 
   protected onContentResize(width: number, height: number): void {
