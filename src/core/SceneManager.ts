@@ -34,4 +34,8 @@ export class SceneManager {
       this.currentScene.onResize(width, height);
     }
   }
+
+  public get renderer() {
+    return this.app.renderer;
+  }
 }
