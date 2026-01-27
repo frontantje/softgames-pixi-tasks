@@ -12,6 +12,8 @@ interface FireParticle {
 }
 
 export class Task3Scene extends BaseTaskScene {
+  static readonly LABEL = "Task 3: Phoenix Flame";
+
   // Particle settings
   private readonly MAX_PARTICLES = 10;
   private readonly PARTICLE_COLORS = [0xff4500, 0xff6600, 0xff8c00, 0xffd700];
@@ -35,14 +37,14 @@ export class Task3Scene extends BaseTaskScene {
   private fireBaseY: number = 0;
 
   constructor(sceneManager: SceneManager) {
-    super(sceneManager);
+    super(sceneManager, Task3Scene.LABEL);
     this.init();
   }
 
   private init() {
     // Title
     this.titleText = new Text({
-      text: "Task 3: Phoenix Flame",
+      text: this.label,
       style: { fontSize: 32, fill: 0xffffff, align: "center" },
     });
     this.titleText.anchor.set(0.5);

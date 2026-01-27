@@ -5,6 +5,8 @@ import { BaseCard } from "../core/BaseCard";
 import { gsap } from "gsap/gsap-core";
 
 export class Task1Scene extends BaseTaskScene {
+  static readonly LABEL = "Task 1: Ace of Shadows";
+
   private titleText!: Text;
   private stack1Container!: Container;
   private stack2Container!: Container;
@@ -16,13 +18,13 @@ export class Task1Scene extends BaseTaskScene {
   private cardMigrationCompleted: boolean = false;
 
   constructor(sceneManager: SceneManager) {
-    super(sceneManager);
+    super(sceneManager, Task1Scene.LABEL);
     this.init();
   }
 
   private init() {
     this.titleText = new Text({
-      text: "Task 1: Ace of Shadows",
+      text: this.label,
       style: { fontSize: 32, fill: 0xffffff, align: "center" },
     });
     this.titleText.anchor.set(0.5);
@@ -127,5 +129,8 @@ export class Task1Scene extends BaseTaskScene {
   protected onContentResize(width: number, height: number): void {
     // Simply center the content container
     this.centerContent();
+  }
+  update(delta: number): void {
+    // No per-frame logic needed
   }
 }

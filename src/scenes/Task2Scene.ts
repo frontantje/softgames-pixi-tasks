@@ -34,6 +34,8 @@ interface DialogueStep {
 }
 
 export class Task2Scene extends BaseTaskScene {
+  static readonly LABEL = "Task 2: Magic Words";
+
   // Constants
   private readonly API_URL =
     "https://private-624120-softgamesassignment.apiary-mock.com/v2/magicwords";
@@ -52,11 +54,11 @@ export class Task2Scene extends BaseTaskScene {
   private dialogueSteps: DialogueStep[] = []; // Array instead of Map
 
   constructor(sceneManager: SceneManager) {
-    super(sceneManager);
+    super(sceneManager, Task2Scene.LABEL);
 
     // Initialize UI elements immediately
     this.titleText = new Text({
-      text: "Task 2: Magic Words",
+      text: this.label,
       style: { fontSize: 32, fill: 0xffffff, align: "center" },
     });
     this.titleText.anchor.set(0.5);
@@ -75,23 +77,8 @@ export class Task2Scene extends BaseTaskScene {
   }
 
   private async init() {
-    this.titleText = new Text({
-      text: "Task 2: Magic Words",
-      style: { fontSize: 32, fill: 0xffffff, align: "center" },
-    });
-    this.titleText.anchor.set(0.5);
     this.content.addChild(this.titleText);
-    this.subText = new Text({
-      text: "",
-      style: { fontSize: 18, fill: 0xffffff, align: "center" },
-    });
-    this.subText.anchor.set(0.5);
-    this.subText.y += 50;
     this.content.addChild(this.subText);
-
-    // create dialogue sides
-    this.leftDialogue = new DialogueContainer("left");
-    this.rightDialogue = new DialogueContainer("right");
     this.content.addChild(this.leftDialogue);
     this.content.addChild(this.rightDialogue);
 
@@ -220,5 +207,9 @@ export class Task2Scene extends BaseTaskScene {
     this.rightDialogue.y = -height / 2 + 100;
 
     this.centerContent();
+  }
+
+  update(_delta: number): void {
+    // No per-frame logic needed
   }
 }

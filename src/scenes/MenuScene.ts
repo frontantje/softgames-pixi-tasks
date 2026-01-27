@@ -7,6 +7,7 @@ import { Task3Scene } from "./Task3Scene.ts";
 import { Button } from "../ui/Button.ts";
 
 export class MenuScene extends Scene {
+  public label: string;
   private sceneManager: SceneManager;
   private buttons: Graphics[] = [];
   private title!: Text;
@@ -14,6 +15,7 @@ export class MenuScene extends Scene {
 
   constructor(sceneManager: SceneManager) {
     super();
+    this.label = "Menu Scene";
     this.sceneManager = sceneManager;
     this.createMenu();
   }
@@ -35,9 +37,9 @@ export class MenuScene extends Scene {
     this.addChild(this.title);
 
     const tasks = [
-      { name: "Task 1: Ace of Shadows", scene: Task1Scene },
-      { name: "Task 2: Magic Words", scene: Task2Scene },
-      { name: "Task 3: Phoenix Flame", scene: Task3Scene },
+      { name: Task1Scene.LABEL, scene: Task1Scene },
+      { name: Task2Scene.LABEL, scene: Task2Scene },
+      { name: Task3Scene.LABEL, scene: Task3Scene },
     ];
 
     tasks.forEach((task, index) => {
