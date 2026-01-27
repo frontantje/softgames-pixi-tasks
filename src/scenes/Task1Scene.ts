@@ -15,7 +15,7 @@ export class Task1Scene extends BaseTaskScene {
   private animationDuration: number = 2; // seconds
   private staggerDelay: number = 1; // seconds
   private cardMigrationStarted: boolean = false;
-  private cardMigrationCompleted: boolean = false;
+  //  private cardMigrationCompleted: boolean = false;
 
   constructor(sceneManager: SceneManager) {
     super(sceneManager, Task1Scene.LABEL);
@@ -85,7 +85,7 @@ export class Task1Scene extends BaseTaskScene {
   private startCardAnimation() {
     const count = this.stack1Container.children.length;
     if (count === 0) {
-      this.cardMigrationCompleted = true;
+      //  this.cardMigrationCompleted = true;
       return;
     }
     const card = this.stack1Container.getChildAt(
@@ -126,11 +126,11 @@ export class Task1Scene extends BaseTaskScene {
     );
   }
 
-  protected onContentResize(width: number, height: number): void {
+  protected onContentResize(): void {
     // Simply center the content container
     this.centerContent();
   }
-  update(delta: number): void {
+  update(): void {
     // No per-frame logic needed
   }
 }

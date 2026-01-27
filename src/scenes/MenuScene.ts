@@ -20,7 +20,7 @@ export class MenuScene extends Scene {
     this.createMenu();
   }
 
-  update(delta: number): void {
+  update(): void {
     // No per-frame logic needed for menu, but could animate buttons/title here if desired
   }
 

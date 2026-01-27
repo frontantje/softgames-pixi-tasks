@@ -183,7 +183,7 @@ export class Task3Scene extends BaseTaskScene {
     }
   }
 
-  protected onContentResize(width: number, height: number): void {
+  protected onContentResize(height: number): void {
     this.titleText.y = -height / 2 + 60;
 
     // Position fire base at bottom center of content area

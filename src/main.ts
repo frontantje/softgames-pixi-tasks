@@ -3,7 +3,6 @@ import { SceneManager } from "./core/SceneManager.ts";
 import { MenuScene } from "./scenes/MenuScene.ts";
 import { FPSCounter } from "./ui/FPSCounter.ts";
 import { BaseCard } from "./core/BaseCard.ts";
-import { Button } from "./ui/Button.ts";
 
 class App {
   private app!: Application;
