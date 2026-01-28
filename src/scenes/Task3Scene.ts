@@ -183,13 +183,17 @@ export class Task3Scene extends BaseTaskScene {
     }
   }
 
-  protected onContentResize(height: number): void {
-    this.titleText.y = -height / 2 + 60;
+  protected onContentResize(width: number, height: number): void {
+    this.titleText.y = -height / 2 + 120;
 
     // Position fire base at bottom center of content area
     this.fireBaseX = 0;
     this.fireBaseY = height / 4; // Slightly below center
-
+    if (width < 525) {
+      this.titleText.style.fontSize = 24;
+    } else {
+      this.titleText.style.fontSize = 32;
+    }
     this.centerContent();
   }
 }
