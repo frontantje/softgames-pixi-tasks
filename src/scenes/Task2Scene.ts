@@ -165,6 +165,11 @@ export class Task2Scene extends BaseTaskScene {
       const relevantContainer: DialogueContainer =
         step.position === "left" ? this.leftDialogue : this.rightDialogue;
       relevantContainer.showDialogue(step.text, step.avatar, step.emoji);
+      if (relevantContainer === this.leftDialogue) {
+        this.rightDialogue.hideDialogue();
+      } else {
+        this.leftDialogue.hideDialogue();
+      }
       this.dialogueStepIndex++;
     } else {
       this.subText.text = "The End!";
@@ -205,11 +210,11 @@ export class Task2Scene extends BaseTaskScene {
 
     // Position left dialogue at top left
     this.leftDialogue.x = -width / 2 + 50;
-    this.leftDialogue.y = -height / 2 + 140;
+    this.leftDialogue.y = -height / 2 + 160;
 
     // Position right dialogue at bottom right (offset accounts for dialogue height ~250px)
     this.rightDialogue.x = width / 2 - 50;
-    this.rightDialogue.y = height / 2 - 300;
+    this.rightDialogue.y = height / 2 - 250;
 
     this.centerContent();
   }
