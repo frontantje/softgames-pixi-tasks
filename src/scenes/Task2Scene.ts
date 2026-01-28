@@ -1,7 +1,7 @@
 import { BaseTaskScene } from "./BaseTaskScene";
 import { SceneManager } from "../core/SceneManager";
 import { DialogueContainer } from "../core/DialogueContainer";
-import { Assets, Texture, Text } from "pixi.js";
+import { Assets, Texture, Text, Rectangle } from "pixi.js";
 import placeholderUrl from "../assets/images/Placeholder_Person.jpg";
 
 interface DialogueLine {
@@ -64,7 +64,7 @@ export class Task2Scene extends BaseTaskScene {
     this.titleText.anchor.set(0.5);
 
     this.subText = new Text({
-      text: "",
+      text: "Loading: 0%",
       style: { fontSize: 18, fill: 0xffffff, align: "center" },
     });
     this.subText.anchor.set(0.5);
@@ -87,13 +87,10 @@ export class Task2Scene extends BaseTaskScene {
     // load all image assets
     await this.loadAssets(data);
 
-    this.content.cursor = "pointer";
-    this.content.eventMode = "static";
+    this.cursor = "pointer";
+    this.eventMode = "static";
     this.subText.text = "Click to start";
-    this.content.on("mousedown", this.advanceDialogue.bind(this));
-
-    // create sprites
-    //   this.createAvatars(data.avatars);
+    this.on("pointerdown", this.advanceDialogue.bind(this));
   }
 
   private async fetchData(): Promise<ResponseData> {
@@ -199,12 +196,20 @@ export class Task2Scene extends BaseTaskScene {
   }
 
   protected onContentResize(width: number, height: number): void {
-    // Position sides
-    this.leftDialogue.x = -width / 2 + 50;
-    this.leftDialogue.y = -height / 2 + 100;
+    // Set hit area to cover the entire screen for click/tap events
+    this.hitArea = new Rectangle(0, 0, width, height);
 
+    // Position title and subtitle at top center
+    this.titleText.y = -height / 2 + 120;
+    this.subText.y = -height / 2 + 180;
+
+    // Position left dialogue at top left
+    this.leftDialogue.x = -width / 2 + 50;
+    this.leftDialogue.y = -height / 2 + 140;
+
+    // Position right dialogue at bottom right (offset accounts for dialogue height ~250px)
     this.rightDialogue.x = width / 2 - 50;
-    this.rightDialogue.y = -height / 2 + 100;
+    this.rightDialogue.y = height / 2 - 300;
 
     this.centerContent();
   }
