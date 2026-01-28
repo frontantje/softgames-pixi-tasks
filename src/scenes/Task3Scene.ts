@@ -1,4 +1,4 @@
-import { BaseTaskScene } from "../core/BaseTaskScene";
+import { BaseTaskScene } from "./BaseTaskScene";
 import { SceneManager } from "../core/SceneManager";
 import { Text, Sprite, Graphics, Texture, Container } from "pixi.js";
 

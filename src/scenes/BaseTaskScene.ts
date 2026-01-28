@@ -1,4 +1,4 @@
-import { SceneManager } from "./SceneManager";
+import { SceneManager } from "../core/SceneManager";
 import { Container, Graphics } from "pixi.js";
 
 export abstract class BaseTaskScene extends Container {

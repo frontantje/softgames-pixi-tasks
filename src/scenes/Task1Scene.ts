@@ -1,4 +1,4 @@
-import { BaseTaskScene } from "../core/BaseTaskScene";
+import { BaseTaskScene } from "./BaseTaskScene";
 import { SceneManager } from "../core/SceneManager";
 import { Text, Container } from "pixi.js";
 import { BaseCard } from "../core/BaseCard";
@@ -7,13 +7,14 @@ import { gsap } from "gsap/gsap-core";
 export class Task1Scene extends BaseTaskScene {
   static readonly LABEL = "Task 1: Ace of Shadows";
 
+  private readonly NUMBER_OF_CARDS: number = 144;
+  private readonly ANIMATION_DURATION: number = 2; // seconds
+  private readonly STAGGER_DELAY: number = 1; // seconds
+
   private titleText!: Text;
   private stack1Container!: Container;
   private stack2Container!: Container;
   private animationLayer!: Container;
-  private numberOfCards: number = 144;
-  private animationDuration: number = 2; // seconds
-  private staggerDelay: number = 1; // seconds
   private cardMigrationStarted: boolean = false;
   //  private cardMigrationCompleted: boolean = false;
 
@@ -45,7 +46,7 @@ export class Task1Scene extends BaseTaskScene {
   private createInitialCardStack() {
     // Create all cards
     const cards: BaseCard[] = [];
-    for (let i = 0; i < this.numberOfCards; i++) {
+    for (let i = 0; i < this.NUMBER_OF_CARDS; i++) {
       cards.push(new BaseCard(i));
     }
 
@@ -70,7 +71,7 @@ export class Task1Scene extends BaseTaskScene {
       this.cardMigrationStarted = true;
       delay = 0;
     } else {
-      delay = this.staggerDelay;
+      delay = this.STAGGER_DELAY;
     }
     gsap.delayedCall(delay, () => {
       this.startCardAnimation();
@@ -98,7 +99,7 @@ export class Task1Scene extends BaseTaskScene {
     const targetLocal = this.animationLayer.toLocal(targetGlobal);
 
     gsap.to(card, {
-      duration: this.animationDuration,
+      duration: this.ANIMATION_DURATION,
       x: targetLocal.x,
       y: targetLocal.y,
       onComplete: () => {
@@ -114,7 +115,7 @@ export class Task1Scene extends BaseTaskScene {
       {
         x: 1.1,
         y: 1.1,
-        duration: this.animationDuration / 3,
+        duration: this.ANIMATION_DURATION / 3,
         yoyo: true,
         repeat: 1,
         ease: "sine.inOut",

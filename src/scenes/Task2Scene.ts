@@ -1,4 +1,4 @@
-import { BaseTaskScene } from "../core/BaseTaskScene";
+import { BaseTaskScene } from "./BaseTaskScene";
 import { SceneManager } from "../core/SceneManager";
 import { DialogueContainer } from "../core/DialogueContainer";
 import { Assets, Texture, Text } from "pixi.js";
