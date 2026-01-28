@@ -1,7 +1,8 @@
+import { Scene } from "../core/Scene";
 import { SceneManager } from "../core/SceneManager";
 import { Container, Graphics } from "pixi.js";
 
-export abstract class BaseTaskScene extends Container {
+export abstract class BaseTaskScene extends Scene {
   protected sceneManager: SceneManager;
   protected content: Container;
   private screenWidth: number = 0;
@@ -37,7 +38,7 @@ export abstract class BaseTaskScene extends Container {
   }
 
   // Override this in child classes for custom content positioning
-  protected abstract onContentResize(width: number, height: number): void;
+  protected abstract onContentResize(width?: number, height?: number): void;
 
   // Helper methods for common positioning
   protected centerContent() {

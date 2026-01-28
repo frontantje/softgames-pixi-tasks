@@ -16,7 +16,6 @@ export class Task1Scene extends BaseTaskScene {
   private stack2Container!: Container;
   private animationLayer!: Container;
   private cardMigrationStarted: boolean = false;
-  //  private cardMigrationCompleted: boolean = false;
 
   constructor(sceneManager: SceneManager) {
     super(sceneManager, Task1Scene.LABEL);
@@ -82,7 +81,6 @@ export class Task1Scene extends BaseTaskScene {
   private startCardAnimation() {
     const count = this.stack1Container.children.length;
     if (count === 0) {
-      //  this.cardMigrationCompleted = true;
       return;
     }
     const card = this.stack1Container.getChildAt(

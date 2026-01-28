@@ -7,7 +7,6 @@ import { Task3Scene } from "./Task3Scene.ts";
 import { Button } from "../ui/Button.ts";
 
 export class MenuScene extends Scene {
-  public label: string;
   private sceneManager: SceneManager;
   private buttons: Graphics[] = [];
   private title!: Text;
