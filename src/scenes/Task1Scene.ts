@@ -32,10 +32,6 @@ export class Task1Scene extends BaseTaskScene {
     this.stack1Container = new Container();
     this.stack2Container = new Container();
     this.animationLayer = new Container();
-    this.stack1Container.y = 100;
-    this.stack1Container.x = -200;
-    this.stack2Container.y = 100;
-    this.stack2Container.x = 200;
     this.content.sortableChildren = true;
     this.stack1Container.zIndex = 0;
     this.stack2Container.zIndex = 0;
@@ -126,8 +122,31 @@ export class Task1Scene extends BaseTaskScene {
     );
   }
 
-  protected onContentResize(): void {
-    // Simply center the content container
+  private initializeLandscapeLayout() {
+    this.stack1Container.y = 100;
+    this.stack1Container.x = -200;
+    this.stack2Container.y = 100;
+    this.stack2Container.x = 200;
+  }
+
+  private initializePortraitLayout() {
+    this.stack1Container.y = -100;
+    this.stack1Container.x = 0;
+    this.stack2Container.y = 200;
+    this.stack2Container.x = 0;
+  }
+
+  protected onContentResize(width: number, height: number): void {
+    // Position title at top of screen (60px from top edge)
+    this.titleText.y = -height / 2 + 120;
+
+    if (width < 525) {
+      this.initializePortraitLayout();
+      this.titleText.style.fontSize = 24;
+    } else {
+      this.initializeLandscapeLayout();
+      this.titleText.style.fontSize = 32;
+    }
     this.centerContent();
   }
   update(): void {

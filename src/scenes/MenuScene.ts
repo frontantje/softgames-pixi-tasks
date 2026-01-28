@@ -60,5 +60,9 @@ export class MenuScene extends Scene {
   public onResize(width: number, height: number): void {
     this.x = width / 2;
     this.y = height / 2;
+    if (width < 525) {
+      this.title.style.fontSize = 32;
+      this.buttonSpacing = 70;
+    }
   }
 }
