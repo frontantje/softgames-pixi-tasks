@@ -164,6 +164,16 @@ export class Task2Scene extends BaseTaskScene {
   }
 
   private advanceDialogue() {
+    // If text is still animating, complete it first instead of advancing
+    if (this.leftDialogue.isTextAnimating()) {
+      this.leftDialogue.completeTextAnimation();
+      return;
+    }
+    if (this.rightDialogue.isTextAnimating()) {
+      this.rightDialogue.completeTextAnimation();
+      return;
+    }
+
     if (this.dialogueStepIndex === 0) {
       this.subText.text = "Click to proceed";
     }

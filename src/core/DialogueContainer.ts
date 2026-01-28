@@ -26,6 +26,7 @@ export class DialogueContainer extends Container {
   private emojiSprite: Sprite | null = null;
   private side: "left" | "right";
   private textTween: gsap.core.Tween | null = null;
+  private fullText: string = "";
 
   constructor(side: "left" | "right") {
     super();
@@ -99,8 +100,8 @@ export class DialogueContainer extends Container {
     this.speechBubble.visible = true;
 
     // Typewriter animation: reveal text letter by letter
-    const fullText = text;
-    const textLength = fullText.length;
+    this.fullText = text;
+    const textLength = this.fullText.length;
     const tweenTarget = { charIndex: 0 };
     this.speechText.text = "";
 
@@ -109,10 +110,13 @@ export class DialogueContainer extends Container {
       duration: textLength * this.TYPEWRITER_SPEED,
       ease: "none",
       onUpdate: () => {
-        this.speechText.text = fullText.substring(
+        this.speechText.text = this.fullText.substring(
           0,
           Math.floor(tweenTarget.charIndex),
         );
+      },
+      onComplete: () => {
+        this.textTween = null;
       },
     });
 
@@ -163,6 +167,20 @@ export class DialogueContainer extends Container {
           },
         },
       );
+    }
+  }
+
+  // Check if text animation is still running
+  isTextAnimating(): boolean {
+    return this.textTween !== null && this.textTween.isActive();
+  }
+
+  // Complete the text animation immediately
+  completeTextAnimation(): void {
+    if (this.textTween) {
+      this.textTween.kill();
+      this.textTween = null;
+      this.speechText.text = this.fullText;
     }
   }
 
