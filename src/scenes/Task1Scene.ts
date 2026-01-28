@@ -3,13 +3,26 @@ import { SceneManager } from "../core/SceneManager";
 import { Text, Container } from "pixi.js";
 import { BaseCard } from "../core/BaseCard";
 import { gsap } from "gsap/gsap-core";
+import { Layout } from "../config/layout";
 
 export class Task1Scene extends BaseTaskScene {
   static readonly LABEL = "Task 1: Ace of Shadows";
 
-  private readonly NUMBER_OF_CARDS: number = 144;
-  private readonly ANIMATION_DURATION: number = 2; // seconds
-  private readonly STAGGER_DELAY: number = 1; // seconds
+  // Card settings
+  private readonly NUMBER_OF_CARDS = 144;
+  private readonly CARD_ROTATION_RANGE = 10; // degrees
+
+  // Animation settings
+  private readonly ANIMATION_DURATION = 2; // seconds
+  private readonly STAGGER_DELAY = 1; // seconds
+  private readonly CARD_SCALE_DURING_ANIMATION = 1.1;
+  private readonly ANIMATION_LAYER_Z_INDEX = 1000;
+
+  // Stack positions
+  private readonly LANDSCAPE_STACK_X_OFFSET = 200;
+  private readonly LANDSCAPE_STACK_Y = 100;
+  private readonly PORTRAIT_STACK1_Y = -100;
+  private readonly PORTRAIT_STACK2_Y = 200;
 
   private titleText!: Text;
   private stack1Container!: Container;
@@ -25,7 +38,7 @@ export class Task1Scene extends BaseTaskScene {
   private init() {
     this.titleText = new Text({
       text: this.label,
-      style: { fontSize: 32, fill: 0xffffff, align: "center" },
+      style: { fontSize: Layout.TITLE_FONT_SIZE_DESKTOP, fill: 0xffffff, align: "center" },
     });
     this.titleText.anchor.set(0.5);
     this.content.addChild(this.titleText);
@@ -35,7 +48,7 @@ export class Task1Scene extends BaseTaskScene {
     this.content.sortableChildren = true;
     this.stack1Container.zIndex = 0;
     this.stack2Container.zIndex = 0;
-    this.animationLayer.zIndex = 1000;
+    this.animationLayer.zIndex = this.ANIMATION_LAYER_Z_INDEX;
     this.content.addChild(this.stack1Container);
     this.content.addChild(this.stack2Container);
     this.content.addChild(this.animationLayer);
@@ -59,7 +72,7 @@ export class Task1Scene extends BaseTaskScene {
     for (const card of cards) {
       this.stack1Container.addChild(card);
       card.anchor.set(0.5);
-      card.rotation = (Math.random() - 0.5) * 10 * (Math.PI / 180);
+      card.rotation = (Math.random() - 0.5) * this.CARD_ROTATION_RANGE * (Math.PI / 180);
     }
   }
 
@@ -111,8 +124,8 @@ export class Task1Scene extends BaseTaskScene {
       card.scale,
       { x: 1, y: 1 },
       {
-        x: 1.1,
-        y: 1.1,
+        x: this.CARD_SCALE_DURING_ANIMATION,
+        y: this.CARD_SCALE_DURING_ANIMATION,
         duration: this.ANIMATION_DURATION / 3,
         yoyo: true,
         repeat: 1,
@@ -122,29 +135,28 @@ export class Task1Scene extends BaseTaskScene {
   }
 
   private initializeLandscapeLayout() {
-    this.stack1Container.y = 100;
-    this.stack1Container.x = -200;
-    this.stack2Container.y = 100;
-    this.stack2Container.x = 200;
+    this.stack1Container.y = this.LANDSCAPE_STACK_Y;
+    this.stack1Container.x = -this.LANDSCAPE_STACK_X_OFFSET;
+    this.stack2Container.y = this.LANDSCAPE_STACK_Y;
+    this.stack2Container.x = this.LANDSCAPE_STACK_X_OFFSET;
   }
 
   private initializePortraitLayout() {
-    this.stack1Container.y = -100;
+    this.stack1Container.y = this.PORTRAIT_STACK1_Y;
     this.stack1Container.x = 0;
-    this.stack2Container.y = 200;
+    this.stack2Container.y = this.PORTRAIT_STACK2_Y;
     this.stack2Container.x = 0;
   }
 
   protected onContentResize(width: number, height: number): void {
-    // Position title at top of screen (60px from top edge)
-    this.titleText.y = -height / 2 + 120;
+    this.titleText.y = -height / 2 + Layout.TITLE_Y_OFFSET;
 
-    if (width < 525) {
+    if (width < Layout.MOBILE_BREAKPOINT) {
       this.initializePortraitLayout();
-      this.titleText.style.fontSize = 24;
+      this.titleText.style.fontSize = Layout.TITLE_FONT_SIZE_MOBILE;
     } else {
       this.initializeLandscapeLayout();
-      this.titleText.style.fontSize = 32;
+      this.titleText.style.fontSize = Layout.TITLE_FONT_SIZE_DESKTOP;
     }
     this.centerContent();
   }

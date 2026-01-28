@@ -2,6 +2,22 @@ import { Container, Sprite, Graphics, Text, Texture } from "pixi.js";
 import { gsap } from "gsap";
 
 export class DialogueContainer extends Container {
+  // Layout constants
+  private readonly AVATAR_SIZE = 100;
+  private readonly EMOJI_SIZE = 32;
+  private readonly EMOJI_GAP = 10;
+  private readonly SPEECH_BUBBLE_Y_OFFSET = 120;
+  private readonly BUBBLE_PADDING = 15;
+  private readonly BUBBLE_CORNER_RADIUS = 10;
+  private readonly TEXT_WORD_WRAP_WIDTH = 250;
+
+  // Animation constants
+  private readonly TYPEWRITER_SPEED = 0.03; // seconds per character
+  private readonly EMOJI_POP_DURATION = 0.2;
+  private readonly EMOJI_PULSE_SCALE = 1.3;
+  private readonly EMOJI_PULSE_DURATION = 0.15;
+  private readonly EMOJI_PULSE_REPEAT = 5;
+
   private avatarSprite: Sprite | null = null;
   private avatarTexture: Texture | undefined = undefined;
   private speechBubble: Container;
@@ -31,7 +47,7 @@ export class DialogueContainer extends Container {
         fontSize: 18,
         fill: 0x000000,
         wordWrap: true,
-        wordWrapWidth: 250,
+        wordWrapWidth: this.TEXT_WORD_WRAP_WIDTH,
       },
     });
     this.speechBubble.addChild(this.speechText);
@@ -55,17 +71,16 @@ export class DialogueContainer extends Container {
 
     // Create/update speech bubble background
     const bubbleGraphics = new Graphics();
-    const padding = 15;
-    const bubbleWidth = this.speechText.width + padding * 2;
-    const bubbleHeight = this.speechText.height + padding * 2;
+    const bubbleWidth = this.speechText.width + this.BUBBLE_PADDING * 2;
+    const bubbleHeight = this.speechText.height + this.BUBBLE_PADDING * 2;
 
     bubbleGraphics
-      .roundRect(0, 0, bubbleWidth, bubbleHeight, 10)
+      .roundRect(0, 0, bubbleWidth, bubbleHeight, this.BUBBLE_CORNER_RADIUS)
       .fill(0xffffff);
 
     // Position text with padding
-    this.speechText.x = padding;
-    this.speechText.y = padding;
+    this.speechText.x = this.BUBBLE_PADDING;
+    this.speechText.y = this.BUBBLE_PADDING;
 
     // Clear previous bubble
     if (this.speechBubble.children.length > 1) {
@@ -73,8 +88,8 @@ export class DialogueContainer extends Container {
     }
     this.speechBubble.addChildAt(bubbleGraphics, 0);
 
-    // Position speech bubble
-    this.speechBubble.y = 120; // Below avatar
+    // Position speech bubble below avatar
+    this.speechBubble.y = this.SPEECH_BUBBLE_Y_OFFSET;
     if (this.side === "left") {
       this.speechBubble.x = 0;
     } else {
@@ -91,7 +106,7 @@ export class DialogueContainer extends Container {
 
     this.textTween = gsap.to(tweenTarget, {
       charIndex: textLength,
-      duration: textLength * 0.03, // 30ms per character
+      duration: textLength * this.TYPEWRITER_SPEED,
       ease: "none",
       onUpdate: () => {
         this.speechText.text = fullText.substring(
@@ -108,24 +123,25 @@ export class DialogueContainer extends Container {
     // Handle emoji
     if (emojiTexture) {
       this.emojiSprite = new Sprite(emojiTexture);
-      this.emojiSprite.width = 32;
-      this.emojiSprite.height = 32;
+      this.emojiSprite.width = this.EMOJI_SIZE;
+      this.emojiSprite.height = this.EMOJI_SIZE;
       this.emojiSprite.anchor.set(0.5);
 
       // Capture the target scale after setting width/height
       const targetScaleX = this.emojiSprite.scale.x;
       const targetScaleY = this.emojiSprite.scale.y;
 
+      const emojiOffset = this.AVATAR_SIZE + this.EMOJI_GAP + this.EMOJI_SIZE / 2;
       if (this.side === "left") {
-        this.emojiSprite.x = this.avatarSprite?.width! + 10 + 16;
+        this.emojiSprite.x = emojiOffset;
       } else {
-        this.emojiSprite.x = -this.avatarSprite?.width! - 20 - 16;
+        this.emojiSprite.x = -emojiOffset;
       }
-      this.emojiSprite.y = this.avatarSprite?.height! / 2;
+      this.emojiSprite.y = this.AVATAR_SIZE / 2;
 
       this.avatarContainer.addChild(this.emojiSprite);
 
-      // Pulsating animation: pop in, then pulse 3 times, end at normal size
+      // Pulsating animation: pop in, then pulse, end at normal size
       const emojiSprite = this.emojiSprite;
       gsap.fromTo(
         emojiSprite.scale,
@@ -133,15 +149,15 @@ export class DialogueContainer extends Container {
         {
           x: targetScaleX,
           y: targetScaleY,
-          duration: 0.2,
+          duration: this.EMOJI_POP_DURATION,
           ease: "back.out",
           onComplete: () => {
             gsap.to(emojiSprite.scale, {
-              x: targetScaleX * 1.3,
-              y: targetScaleY * 1.3,
-              duration: 0.15,
+              x: targetScaleX * this.EMOJI_PULSE_SCALE,
+              y: targetScaleY * this.EMOJI_PULSE_SCALE,
+              duration: this.EMOJI_PULSE_DURATION,
               ease: "sine.inOut",
-              repeat: 5,
+              repeat: this.EMOJI_PULSE_REPEAT,
               yoyo: true,
             });
           },
@@ -169,14 +185,14 @@ export class DialogueContainer extends Container {
     }
 
     this.avatarSprite = new Sprite(texture);
-    this.avatarSprite.width = 100;
-    this.avatarSprite.height = 100;
+    this.avatarSprite.width = this.AVATAR_SIZE;
+    this.avatarSprite.height = this.AVATAR_SIZE;
     this.avatarSprite.y = 0;
 
     if (this.side === "left") {
       this.avatarSprite.x = 0;
     } else {
-      this.avatarSprite.x = -100; // Align right
+      this.avatarSprite.x = -this.AVATAR_SIZE;
     }
 
     this.avatarContainer.addChild(this.avatarSprite);

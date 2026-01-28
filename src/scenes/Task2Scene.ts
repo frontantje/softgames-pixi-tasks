@@ -3,6 +3,7 @@ import { SceneManager } from "../core/SceneManager";
 import { DialogueContainer } from "../core/DialogueContainer";
 import { Assets, Texture, Text, Rectangle } from "pixi.js";
 import placeholderUrl from "../assets/images/Placeholder_Person.jpg";
+import { Layout } from "../config/layout";
 
 interface DialogueLine {
   name: string;
@@ -36,9 +37,16 @@ interface DialogueStep {
 export class Task2Scene extends BaseTaskScene {
   static readonly LABEL = "Task 2: Magic Words";
 
-  // Constants
+  // API
   private readonly API_URL =
     "https://private-624120-softgamesassignment.apiary-mock.com/v2/magicwords";
+
+  // Layout constants
+  private readonly SUBTEXT_FONT_SIZE = 18;
+  private readonly SUBTEXT_Y_OFFSET = 180;
+  private readonly DIALOGUE_EDGE_PADDING = 50;
+  private readonly LEFT_DIALOGUE_Y_OFFSET = 160;
+  private readonly RIGHT_DIALOGUE_BOTTOM_OFFSET = 250;
 
   // UI Elements
   private titleText: Text;
@@ -59,16 +67,15 @@ export class Task2Scene extends BaseTaskScene {
     // Initialize UI elements immediately
     this.titleText = new Text({
       text: this.label,
-      style: { fontSize: 32, fill: 0xffffff, align: "center" },
+      style: { fontSize: Layout.TITLE_FONT_SIZE_DESKTOP, fill: 0xffffff, align: "center" },
     });
     this.titleText.anchor.set(0.5);
 
     this.subText = new Text({
       text: "Loading: 0%",
-      style: { fontSize: 18, fill: 0xffffff, align: "center" },
+      style: { fontSize: this.SUBTEXT_FONT_SIZE, fill: 0xffffff, align: "center" },
     });
     this.subText.anchor.set(0.5);
-    this.subText.y = 50;
 
     this.leftDialogue = new DialogueContainer("left");
     this.rightDialogue = new DialogueContainer("right");
@@ -205,16 +212,16 @@ export class Task2Scene extends BaseTaskScene {
     this.hitArea = new Rectangle(0, 0, width, height);
 
     // Position title and subtitle at top center
-    this.titleText.y = -height / 2 + 120;
-    this.subText.y = -height / 2 + 180;
+    this.titleText.y = -height / 2 + Layout.TITLE_Y_OFFSET;
+    this.subText.y = -height / 2 + this.SUBTEXT_Y_OFFSET;
 
     // Position left dialogue at top left
-    this.leftDialogue.x = -width / 2 + 50;
-    this.leftDialogue.y = -height / 2 + 160;
+    this.leftDialogue.x = -width / 2 + this.DIALOGUE_EDGE_PADDING;
+    this.leftDialogue.y = -height / 2 + this.LEFT_DIALOGUE_Y_OFFSET;
 
-    // Position right dialogue at bottom right (offset accounts for dialogue height ~250px)
-    this.rightDialogue.x = width / 2 - 50;
-    this.rightDialogue.y = height / 2 - 250;
+    // Position right dialogue at bottom right
+    this.rightDialogue.x = width / 2 - this.DIALOGUE_EDGE_PADDING;
+    this.rightDialogue.y = height / 2 - this.RIGHT_DIALOGUE_BOTTOM_OFFSET;
 
     this.centerContent();
   }

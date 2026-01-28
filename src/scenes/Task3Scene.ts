@@ -1,6 +1,7 @@
 import { BaseTaskScene } from "./BaseTaskScene";
 import { SceneManager } from "../core/SceneManager";
 import { Text, Sprite, Graphics, Texture, Container } from "pixi.js";
+import { Layout } from "../config/layout";
 
 interface FireParticle {
   sprite: Sprite;
@@ -14,9 +15,15 @@ interface FireParticle {
 export class Task3Scene extends BaseTaskScene {
   static readonly LABEL = "Task 3: Phoenix Flame";
 
+  // Layout constants
+  private readonly FIRE_BASE_Y_RATIO = 0.25; // fraction of height
+
   // Particle settings
   private readonly MAX_PARTICLES = 10;
   private readonly PARTICLE_COLORS = [0xff4500, 0xff6600, 0xff8c00, 0xffd700];
+  private readonly PARTICLE_TEXTURE_RADIUS = 32;
+  private readonly PARTICLE_GRADIENT_STEPS = 8;
+  private readonly SPAWN_STAGGER_DELAY = 0.2;
 
   // Spawn settings
   private readonly BASE_SPREAD = 30;
@@ -28,6 +35,12 @@ export class Task3Scene extends BaseTaskScene {
   private readonly SCALE_BASE = 0.5;
   private readonly SCALE_VARIANCE = 0.5;
   private readonly TURBULENCE = 50;
+
+  // Color transition thresholds
+  private readonly COLOR_THRESHOLD_LOW = 0.3;
+  private readonly COLOR_THRESHOLD_MID = 0.6;
+  private readonly COLOR_DYING = 0xff2200;
+  private readonly COLOR_MID = 0xff4500;
 
   private titleText!: Text;
   private particleContainer!: Container;
@@ -45,7 +58,7 @@ export class Task3Scene extends BaseTaskScene {
     // Title
     this.titleText = new Text({
       text: this.label,
-      style: { fontSize: 32, fill: 0xffffff, align: "center" },
+      style: { fontSize: Layout.TITLE_FONT_SIZE_DESKTOP, fill: 0xffffff, align: "center" },
     });
     this.titleText.anchor.set(0.5);
     this.content.addChild(this.titleText);
@@ -65,12 +78,12 @@ export class Task3Scene extends BaseTaskScene {
       sprite.visible = false;
       this.particleContainer.addChild(sprite);
 
-      // Stagger initial spawns with 0.1s delay between each
+      // Stagger initial spawns
       this.particles.push({
         sprite,
         velocityX: 0,
         velocityY: 0,
-        life: -i * 0.2,
+        life: -i * this.SPAWN_STAGGER_DELAY,
         maxLife: 0,
         startScale: 1,
       });
@@ -79,14 +92,12 @@ export class Task3Scene extends BaseTaskScene {
 
   private createParticleTexture(): Texture {
     const graphics = new Graphics();
-    const radius = 32;
 
     // Create a soft radial gradient circle
-    const steps = 8;
-    for (let i = steps; i >= 0; i--) {
-      const ratio = i / steps;
+    for (let i = this.PARTICLE_GRADIENT_STEPS; i >= 0; i--) {
+      const ratio = i / this.PARTICLE_GRADIENT_STEPS;
       const alpha = 1 - ratio;
-      const r = radius * ratio + 2;
+      const r = this.PARTICLE_TEXTURE_RADIUS * ratio + 2;
 
       graphics.circle(0, 0, r);
       graphics.fill({ color: 0xffffff, alpha: alpha * 0.8 });
@@ -175,24 +186,25 @@ export class Task3Scene extends BaseTaskScene {
       particle.sprite.alpha = lifeRatio;
 
       // Color transition: orange -> red -> dark as it dies
-      if (lifeRatio < 0.3) {
-        particle.sprite.tint = 0xff2200; // Dark red near death
-      } else if (lifeRatio < 0.6) {
-        particle.sprite.tint = 0xff4500; // Orange-red
+      if (lifeRatio < this.COLOR_THRESHOLD_LOW) {
+        particle.sprite.tint = this.COLOR_DYING;
+      } else if (lifeRatio < this.COLOR_THRESHOLD_MID) {
+        particle.sprite.tint = this.COLOR_MID;
       }
     }
   }
 
   protected onContentResize(width: number, height: number): void {
-    this.titleText.y = -height / 2 + 120;
+    this.titleText.y = -height / 2 + Layout.TITLE_Y_OFFSET;
 
     // Position fire base at bottom center of content area
     this.fireBaseX = 0;
-    this.fireBaseY = height / 4; // Slightly below center
-    if (width < 525) {
-      this.titleText.style.fontSize = 24;
+    this.fireBaseY = height * this.FIRE_BASE_Y_RATIO;
+
+    if (width < Layout.MOBILE_BREAKPOINT) {
+      this.titleText.style.fontSize = Layout.TITLE_FONT_SIZE_MOBILE;
     } else {
-      this.titleText.style.fontSize = 32;
+      this.titleText.style.fontSize = Layout.TITLE_FONT_SIZE_DESKTOP;
     }
     this.centerContent();
   }

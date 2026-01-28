@@ -5,12 +5,17 @@ import { Task1Scene } from "./Task1Scene.ts";
 import { Task2Scene } from "./Task2Scene.ts";
 import { Task3Scene } from "./Task3Scene.ts";
 import { Button } from "../ui/Button.ts";
+import { Layout } from "../config/layout";
 
 export class MenuScene extends Scene {
+  // Layout constants
+  private readonly BUTTON_SPACING_DESKTOP = 100;
+  private readonly BUTTON_SPACING_MOBILE = 70;
+
   private sceneManager: SceneManager;
   private buttons: Graphics[] = [];
   private title!: Text;
-  private buttonSpacing: number = 100;
+  private buttonSpacing: number = this.BUTTON_SPACING_DESKTOP;
 
   constructor(sceneManager: SceneManager) {
     super();
@@ -27,7 +32,7 @@ export class MenuScene extends Scene {
     this.title = new Text({
       text: "Test Tasks Menu",
       style: {
-        fontSize: 48,
+        fontSize: Layout.MENU_TITLE_FONT_SIZE_DESKTOP,
         fill: 0xffffff,
         fontWeight: "bold",
       },
@@ -59,9 +64,12 @@ export class MenuScene extends Scene {
   public onResize(width: number, height: number): void {
     this.x = width / 2;
     this.y = height / 2;
-    if (width < 525) {
-      this.title.style.fontSize = 32;
-      this.buttonSpacing = 70;
+    if (width < Layout.MOBILE_BREAKPOINT) {
+      this.title.style.fontSize = Layout.MENU_TITLE_FONT_SIZE_MOBILE;
+      this.buttonSpacing = this.BUTTON_SPACING_MOBILE;
+    } else {
+      this.title.style.fontSize = Layout.MENU_TITLE_FONT_SIZE_DESKTOP;
+      this.buttonSpacing = this.BUTTON_SPACING_DESKTOP;
     }
   }
 }
